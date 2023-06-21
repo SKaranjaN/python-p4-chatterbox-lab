@@ -40,7 +40,7 @@ def messages():
 
         return response
 
-@app.route('/messages/<int:id>', methods=['GET', 'PATCH'])
+@app.route('/messages/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
 def messages_by_id(id):
     message = Message.query.filter_by(id=id).first()
 
@@ -55,20 +55,28 @@ def messages_by_id(id):
         return response
     
     elif request.method == 'PATCH':
-        message = Message.query.filter_by(id=id).first()
-
         for attr in request.json:
             setattr(message, attr, request.json.get(attr))
 
-        db.session.add(message)
         db.session.commit()
 
         message_dict = message.to_dict()
-
+        
         response = make_response(
             jsonify(message_dict),
             200
         )
+
+        return response
+    
+    elif request.method == 'DELETE':
+        if not message:
+            return jsonify({'error': 'Message not found'}), 404
+
+        db.session.delete(message)
+        db.session.commit()
+
+        response = make_response(jsonify({'message': 'Message deleted successfully'}), 200)
 
         return response
 
