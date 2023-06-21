@@ -17,3 +17,4 @@ class Message(db.Model, SerializerMixin):
     body = db.Column(db.String)
     username = db.Column(db.String)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
